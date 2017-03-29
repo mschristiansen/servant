@@ -29,6 +29,9 @@ type TestApi =
   -- With headers
   :<|> "header" :> Get '[JSON] (Headers '[Header "Content-Type" String] NoContent)
 
+  -- With basic authentication
+  :<|> "auth" :> BasicAuth "secret" String :> Get '[JSON] NoContent
+
 apiLink :: (IsElem endpoint TestApi, HasLink endpoint)
          => Proxy endpoint -> MkLink endpoint
 apiLink = safeLink (Proxy :: Proxy TestApi)
@@ -70,6 +73,10 @@ spec = describe "Servant.Utils.Links" $ do
 
     it "generates correct links when there is headers" $ do
         apiLink (Proxy :: Proxy ("header" :> Get '[JSON] (Headers '[Header "Content-Type" String] NoContent))) `shouldBeLink` "header"
+
+    it "generates correct links when there is headers" $ do
+        apiLink (Proxy :: Proxy ("auth" :> BasicAuth "secret" String :> Get '[JSON] NoContent)) `shouldBeLink` "auth"
+
 
 -- |
 -- Before https://github.com/CRogers/should-not-typecheck/issues/5 is fixed,
